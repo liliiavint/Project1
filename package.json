@@ -1,12 +1,13 @@
 {
   "name": "project1",
   "version": "1.0.0",
+  "type": "module",
   "description": "student Project",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",
-    "test": "newman run user_store.postman_collection.json"
+    "test": "newman run ..............json"
   },
   "author": "Lilia (https://github.com/liliiavint)",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "express": "^4.19.2"
   },
   "devDependencies": {
-    "newman": "^6.1.2"
+    "newman": "^6.1.2",
+    "nodemon": "^3.1.0"
   }
 }
