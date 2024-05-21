@@ -12,9 +12,6 @@ jobs:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
       
-    - name: Change directory to project-a
-      run: cd Project1
-      
     # INstall Node on the runner
     - name: Install Node
       uses: actions/setup-node@v1
@@ -43,11 +40,7 @@ jobs:
       run: |
        npm install -D newman
 
-    # Make directory to upload the test results
-    - name: Make Directory for results
-      run: mkdir -p testResults
-
-    # run the postman collection to console
+      # run the postman collection to console
     - name: Run POSTMAN collection to console
       run: |
        newman run ./Project1.postman_collection.json
