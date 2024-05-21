@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "nodemon app.js",
     "start": "node app.js",
-    "test": "newman run ..............json"
+    "test": "newman run Project1.postman_collection.json"
   },
   "author": "Lilia (https://github.com/liliiavint)",
   "license": "ISC",

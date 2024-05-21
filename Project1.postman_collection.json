@@ -1,0 +1,284 @@
+{
+	"info": {
+		"_postman_id": "0294d2d9-757c-43c9-bdaa-952b5e12c4d4",
+		"name": "Project-movie-store",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "34520114"
+	},
+	"item": [
+		{
+			"name": "New Folder",
+			"item": [
+				{
+					"name": "create movie",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 201\", () => {\r",
+									"    pm.response.to.have.status(201);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response contains new movie\", () => {\r",
+									"    const data = pm.response.json();\r",
+									"    pm.expect(data).to.have.property(\"title\", data.title);\r",
+									"    pm.expect(data).to.have.property(\"productionDate\", data.productionDate);\r",
+									"    pm.expect(data).to.have.property(\"producer\", data.producer);\r",
+									"    pm.expect(data).to.have.property(\"rating\", data.rating);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"New movie data is correct\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.title).to.eql(\"Forrest Gump\");\r",
+									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");\r",
+									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");\r",
+									"    pm.expect(jsonData.rating).to.eql(\"8.8\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"title\": \"Forrest Gump\",\r\n    \"productionDate\": \"1994\", \r\n    \"producer\": \"Robert Zemeckis\",\r\n    \"rating\": \"8.8\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{basic-url}}movies/item",
+							"host": [
+								"{{basic-url}}movies"
+							],
+							"path": [
+								"item"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "delete movie",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\",() => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"pm.test(\"Response contains success message\",() => {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.include(\"deleted successfully\");\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{basic-url}}movies/5",
+							"host": [
+								"{{basic-url}}movies"
+							],
+							"path": [
+								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "New Folder",
+			"item": [
+				{
+					"name": "get movie by id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Response is JSON\",() => {",
+									"    pm.response.to.be.json;",
+									"});",
+									"",
+									"pm.test(\"Movie data is present\",() => {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('array').that.is.not.empty;",
+									"    pm.expect(jsonData[0]).to.have.property('id');",
+									"    pm.expect(jsonData[0]).to.have.property('title');",
+									"    pm.expect(jsonData[0]).to.have.property('rating');",
+									"    pm.expect(jsonData[0]).to.have.property('producer');",
+									"});",
+									"",
+									"pm.test(\"Response contains the correct movie ID\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].id).to.eql(2); ",
+									"",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{basic-url}}movies/2",
+							"host": [
+								"{{basic-url}}movies"
+							],
+							"path": [
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get movie by wrong id",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 404\", function () {",
+									"    pm.response.to.have.status(404);",
+									"});",
+									"",
+									"pm.test(\"Error message is correct\", function () {",
+									"    pm.response.to.have.body('Movie not found');",
+									"});",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{basic-url}}movies/99",
+							"host": [
+								"{{basic-url}}movies"
+							],
+							"path": [
+								"99"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change rating movie",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is JSON\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Movie data is present\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData).to.have.property('id');\r",
+									"    pm.expect(jsonData).to.have.property('title');\r",
+									"    pm.expect(jsonData).to.have.property('productionDate');\r",
+									"    pm.expect(jsonData).to.have.property('producer');\r",
+									"    pm.expect(jsonData).to.have.property('rating');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Rating is updated correctly\", function () {\r",
+									"    var jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.rating).to.eql('10');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rating\": \"10\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{basic-url}}movies/3",
+							"host": [
+								"{{basic-url}}movies"
+							],
+							"path": [
+								"3"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "basic-url",
+			"value": "http://localhost:3002/",
+			"type": "string"
+		}
+	]
+}

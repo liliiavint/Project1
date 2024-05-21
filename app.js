@@ -49,15 +49,6 @@ app.get('/movies/:id', (req, res) => {
     res.json(movies[movieIndex]);
   }});
 
-
-
-
-
-
-
-
-
-
 app.get('*', (req, res) => {
     console.log('404');
     return res.send('404 - content not found');
