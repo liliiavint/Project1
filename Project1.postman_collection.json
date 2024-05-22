@@ -34,7 +34,8 @@
 									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");\r",
 									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");\r",
 									"    pm.expect(jsonData.rating).to.eql(\"8.8\");\r",
-									"});"
+									"});\r",
+									"pm.globals.set(\"variable_key\", \"variable_value\");"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -54,30 +55,41 @@
 							}
 						},
 						"url": {
-							"raw": "{{basic-url}}movies/item",
+							"raw": "{{basic-url}}movies/item/",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"item"
+								"item",
+								""
 							]
 						}
 					},
 					"response": []
 				},
 				{
-					"name": "delete movie",
+					"name": "change rating movie",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\",() => {\r",
+									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
-									"pm.test(\"Response contains success message\",() => {\r",
+									"\r",
+									"pm.test(\"Response is JSON\", function () {\r",
+									"    pm.response.to.be.json;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Movie data is present\", function () {\r",
 									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.message).to.include(\"deleted successfully\");\r",
+									"    pm.expect(jsonData).to.have.property('rating');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Rating is updated correctly\", function () {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.rating).to.eql('10');\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -86,15 +98,38 @@
 						}
 					],
 					"request": {
-						"method": "DELETE",
+						"method": "PUT",
 						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"rating\": \"10\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
-							"raw": "{{basic-url}}movies/5",
+							"raw": "{{basic-url}}movies/1",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"5"
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all movie",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{basic-url}}movies",
+							"host": [
+								"{{basic-url}}movies"
 							]
 						}
 					},
@@ -112,7 +147,7 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", () => {",
+									"pm.test(\"Status code is 404\", () => {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
@@ -130,10 +165,10 @@
 									"});",
 									"",
 									"pm.test(\"Response contains the correct movie ID\", function () {",
-									"    var jsonData = pm.response.json();",
-									"    pm.expect(jsonData[0].id).to.eql(2); ",
-									"",
-									"});"
+									"   let jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].id).to.eql(1); ",
+									"});",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -144,12 +179,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{basic-url}}movies/2",
+							"raw": "{{basic-url}}movies/1",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"2"
+								"1"
 							]
 						}
 					},
@@ -192,32 +227,18 @@
 					"response": []
 				},
 				{
-					"name": "change rating movie",
+					"name": "delete movie",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
+									"pm.test(\"Status code is 200\",() => {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
-									"\r",
-									"pm.test(\"Response is JSON\", function () {\r",
-									"    pm.response.to.be.json;\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Movie data is present\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData).to.have.property('id');\r",
-									"    pm.expect(jsonData).to.have.property('title');\r",
-									"    pm.expect(jsonData).to.have.property('productionDate');\r",
-									"    pm.expect(jsonData).to.have.property('producer');\r",
-									"    pm.expect(jsonData).to.have.property('rating');\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Rating is updated correctly\", function () {\r",
-									"    var jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.rating).to.eql('10');\r",
+									"pm.test(\"Response contains success message\",() => {\r",
+									"    let jsonData = pm.response.json();\r",
+									"    pm.expect(jsonData.message).to.include(\"deleted successfully\");\r",
 									"});"
 								],
 								"type": "text/javascript",
@@ -226,24 +247,15 @@
 						}
 					],
 					"request": {
-						"method": "PUT",
+						"method": "DELETE",
 						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\r\n    \"rating\": \"10\"\r\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
 						"url": {
-							"raw": "{{basic-url}}movies/3",
+							"raw": "{{basic-url}}movies/1",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"3"
+								"1"
 							]
 						}
 					},

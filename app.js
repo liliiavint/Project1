@@ -29,6 +29,10 @@ app.delete('/movies/:id', (req, res) => {
     }
 });
 
+app.get('/movies/', (req, res) => {
+  return res.send(JSON.stringify({movies}));
+});
+
 app.get('/movies/:id', (req, res) => {
     const movieId = +req.params.id;
     const movie = movies.filter(index => index.id === movieId);
