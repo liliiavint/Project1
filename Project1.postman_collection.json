@@ -34,8 +34,11 @@
 									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");\r",
 									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");\r",
 									"    pm.expect(jsonData.rating).to.eql(\"8.8\");\r",
+									"    pm.globals.set(\"movieId\", jsonData.id);\r",
 									"});\r",
-									"pm.globals.set(\"variable_key\", \"variable_value\");"
+									"\r",
+									"\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -74,27 +77,16 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 404\", () => {",
+									"pm.test(\"Status code is 200\", () => {",
 									"    pm.response.to.have.status(200);",
-									"});",
-									"",
-									"pm.test(\"Response is JSON\",() => {",
-									"    pm.response.to.be.json;",
-									"});",
-									"",
-									"pm.test(\"Movie data is present\",() => {",
-									"    let jsonData = pm.response.json();",
-									"    pm.expect(jsonData).to.be.an('array').that.is.not.empty;",
-									"    pm.expect(jsonData[0]).to.have.property('id');",
-									"    pm.expect(jsonData[0]).to.have.property('title');",
-									"    pm.expect(jsonData[0]).to.have.property('rating');",
-									"    pm.expect(jsonData[0]).to.have.property('producer');",
 									"});",
 									"",
 									"pm.test(\"Response contains the correct movie ID\", function () {",
 									"   let jsonData = pm.response.json();",
-									"    pm.expect(jsonData[0].id).to.eql(1); ",
+									"        let movieId = pm.globals.get(\"movieId\");",
+									"        pm.expect(jsonData[0].id).to.eql(movieId);",
 									"});",
+									"",
 									""
 								],
 								"type": "text/javascript",
@@ -106,12 +98,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{basic-url}}movies/1",
+							"raw": "{{basic-url}}movies/{{movieId}}",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"1"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -131,7 +123,6 @@
 									"pm.test(\"Response body contains the required fields for movies\", function () {\r",
 									"    const responseData = pm.response.json();\r",
 									"    pm.expect(responseData).to.be.an('Object').that.is.not.empty;\r",
-									"\r",
 									"});\r",
 									"\r",
 									"pm.test(\"No empty fields in movies response\", function () {\r",
@@ -193,12 +184,12 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{basic-url}}movies/1",
+							"raw": "{{basic-url}}movies/{{movieId}}",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"1"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -229,12 +220,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{basic-url}}movies/1",
+							"raw": "{{basic-url}}movies/{{movieId}}",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"1"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -252,26 +243,27 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 201\", () => {\r",
-									"    pm.response.to.have.status(201);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response contains new movie\", () => {\r",
-									"    const data = pm.response.json();\r",
-									"    pm.expect(data).to.have.property(\"title\", data.title);\r",
-									"    pm.expect(data).to.have.property(\"productionDate\", data.productionDate);\r",
-									"    pm.expect(data).to.have.property(\"producer\", data.producer);\r",
-									"    pm.expect(data).to.have.property(\"rating\", data.rating);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"New movie data is correct\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.title).to.eql(\"Forrest Gump\");\r",
-									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");\r",
-									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");\r",
-									"    pm.expect(jsonData.rating).to.eql(\"8.8\");\r",
-									"});\r",
-									"pm.globals.set(\"variable_key\", \"variable_value\");"
+									"pm.test(\"Status code is 201\", () => {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response contains new movie\", () => {",
+									"    const data = pm.response.json();",
+									"    pm.expect(data).to.have.property(\"title\", data.title);",
+									"    pm.expect(data).to.have.property(\"productionDate\", data.productionDate);",
+									"    pm.expect(data).to.have.property(\"producer\", data.producer);",
+									"    pm.expect(data).to.have.property(\"rating\", data.rating);",
+									"});",
+									"",
+									"pm.test(\"New movie data is correct\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql(\"Forrest Gump\");",
+									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");",
+									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");",
+									"    pm.expect(jsonData.rating).to.eql(\"8.8\");",
+									"    pm.globals.set(\"movieId\", jsonData.id);",
+									"});",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -346,12 +338,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{basic-url}}movies/2",
+							"raw": "{{basic-url}}movies/{{movieId}}",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"2"
+								"{{movieId}}"
 							]
 						}
 					},
@@ -369,6 +361,20 @@
 									"});",
 									"",
 									"",
+									"pm.test(\"Response contains the correct movie ID\", function () {",
+									"   let jsonData = pm.response.json();",
+									"        let movieId = pm.globals.get(\"movieId\");",
+									"        pm.expect(jsonData[0].id).to.eql(movieId);",
+									"});",
+									"",
+									"pm.test(\"change movie is correct\", function () {",
+									"    let jsonData = pm.response.json();",
+									"    pm.expect(jsonData[0].title).to.eql(\"Forrest Gump\");",
+									"    pm.expect(jsonData[0].productionDate).to.eql(\"1994\");",
+									"    pm.expect(jsonData[0].producer).to.eql(\"Robert Zemeckis\");",
+									"    pm.expect(jsonData[0].rating).to.eql(\"10\");",
+									"});",
+									"",
 									""
 								],
 								"type": "text/javascript",
@@ -380,12 +386,60 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{basic-url}}movies/2",
+							"raw": "{{basic-url}}movies/{{movieId}}",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"2"
+								"{{movieId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all movie",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Response status code is 200\", function () {\r",
+									"  pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response body contains the required fields for movies\", function () {\r",
+									"    const responseData = pm.response.json();\r",
+									"    pm.expect(responseData).to.be.an('Object').that.is.not.empty;\r",
+									"});\r",
+									"\r",
+									"pm.test(\"No empty fields in movies response\", function () {\r",
+									"    const responseData = pm.response.json().movies;\r",
+									"    responseData.forEach(function (movie) {\r",
+									"        pm.expect(movie.id).to.not.be.null;\r",
+									"        pm.expect(movie.id).to.not.be.undefined;\r",
+									"        pm.expect(movie.title).to.not.be.empty;\r",
+									"        pm.expect(movie.productionDate).to.not.be.null;\r",
+									"        pm.expect(movie.productionDate).to.not.be.undefined;\r",
+									"        pm.expect(movie.producer).to.not.be.empty;\r",
+									"        pm.expect(movie.rating).to.not.be.null;\r",
+									"        pm.expect(movie.rating).to.not.be.undefined;\r",
+									"    });\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{basic-url}}movies",
+							"host": [
+								"{{basic-url}}movies"
 							]
 						}
 					},
