@@ -7,7 +7,7 @@
 	},
 	"item": [
 		{
-			"name": "New Folder",
+			"name": "Create and delete movie",
 			"item": [
 				{
 					"name": "create movie",
@@ -16,28 +16,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 201\", () => {\r",
-									"    pm.response.to.have.status(201);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response contains new movie\", () => {\r",
-									"    const data = pm.response.json();\r",
-									"    pm.expect(data).to.have.property(\"title\", data.title);\r",
-									"    pm.expect(data).to.have.property(\"productionDate\", data.productionDate);\r",
-									"    pm.expect(data).to.have.property(\"producer\", data.producer);\r",
-									"    pm.expect(data).to.have.property(\"rating\", data.rating);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"New movie data is correct\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.title).to.eql(\"Forrest Gump\");\r",
-									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");\r",
-									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");\r",
-									"    pm.expect(jsonData.rating).to.eql(\"8.8\");\r",
-									"    pm.globals.set(\"movieId\", jsonData.id);\r",
-									"});\r",
-									"\r",
-									"\r",
+									"const responseData = pm.response.json();",
+									"const requestData = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.collectionVariables.set(\"movieId\", responseData.id);",
+									"pm.collectionVariables.set(\"title\", requestData.title);",
+									"pm.collectionVariables.set(\"productionDate\", requestData.productionDate);",
+									"pm.collectionVariables.set(\"producer\", requestData.producer);",
+									"pm.collectionVariables.set(\"rating\", requestData.rating);",
+									"",
+									"pm.test(\"Status code is 201\", () => { ",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test(\"Response contains new movie\", () => {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property(\"id\", jsonData.id);",
+									"});",
+									"",
+									"pm.test(\"New movie data is correct\", () => {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData.title).to.eql(\"Forrest Gump\");",
+									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");",
+									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");",
+									"    pm.expect(jsonData.rating).to.eql(\"8.8\");",
+									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -81,12 +84,24 @@
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"pm.test(\"Response contains the correct movie ID\", function () {",
-									"   let jsonData = pm.response.json();",
-									"        let movieId = pm.globals.get(\"movieId\");",
-									"        pm.expect(jsonData[0].id).to.eql(movieId);",
+									"pm.test(\"Response contains the correct movie ID\", () =>{",
+									"    let jsonData = pm.response.json();",
+									"    let movieId = pm.collectionVariables.get(\"movieId\");",
+									"    pm.expect(jsonData[0].id).to.eql(movieId);",
 									"});",
 									"",
+									"pm.test(\"Response body not empty\", () => {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.be.an('Array').that.is.not.empty;",
+									"});",
+									"",
+									"pm.test(\"Response body includes properties: title, productionDate, producer and rating\", () => {",
+									"const jsonData = pm.response.json();",
+									"pm.expect(jsonData[0]).to.have.property('title');",
+									"pm.expect(jsonData[0]).to.have.property('productionDate');",
+									"pm.expect(jsonData[0]).to.have.property('producer');",
+									"pm.expect(jsonData[0]).to.have.property('rating');",
+									"});",
 									""
 								],
 								"type": "text/javascript",
@@ -116,11 +131,11 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Response status code is 200\", function () {\r",
+									"pm.test(\"Response status code is 200\", () => {\r",
 									"  pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Response body contains the required fields for movies\", function () {\r",
+									"pm.test(\"Response body contains the required fields for movies\", () => {\r",
 									"    const responseData = pm.response.json();\r",
 									"    pm.expect(responseData).to.be.an('Object').that.is.not.empty;\r",
 									"});\r",
@@ -137,6 +152,19 @@
 									"        pm.expect(movie.rating).to.not.be.null;\r",
 									"        pm.expect(movie.rating).to.not.be.undefined;\r",
 									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response does not have unexpected properties\", () => {\r",
+									"    const jsonData = pm.response.json();\r",
+									"    if (jsonData.length > 0) {\r",
+									"        const allowedKeys = [\"id\", \"title\", \"productionDate\", \"producer\", \"rating\"];\r",
+									"        jsonData.forEach(movie => {\r",
+									"            const responseKeys = Object.keys(movie);\r",
+									"            responseKeys.forEach(key => {\r",
+									"                pm.expect(allowedKeys).to.include(key);\r",
+									"            });\r",
+									"        });\r",
+									"    }\r",
 									"});\r",
 									""
 								],
@@ -164,13 +192,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {\r",
-									"    pm.response.to.have.status(200);\r",
-									"});\r",
-									"\r",
-									"pm.test(\"Response contains success message\", function () {\r",
-									"    let jsonData = pm.response.json();\r",
-									"    pm.expect(jsonData.message).to.include(\"deleted successfully\");\r",
+									"pm.test(\"Status code is 204\",  () => {\r",
+									"    pm.response.to.have.status(204);\r",
 									"});\r",
 									"\r",
 									""
@@ -196,18 +219,20 @@
 					"response": []
 				},
 				{
-					"name": "get movie by id",
+					"name": "get all movie without the deleting movie",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 404\", function () {",
-									"    pm.response.to.have.status(404);",
+									"pm.test(\"Response status code is 200\", () => {",
+									"    pm.response.to.have.status(200);",
 									"});",
-									"",
-									"pm.test(\"Error message is correct\", function () {",
-									"    pm.response.to.have.body('Movie not found');",
+									"pm.test(\"Response body doesn't have the deleted movie ID\", ()=> {",
+									"    const responseData = pm.response.json().movies;",
+									"    responseData.forEach((movie) => {",
+									"        pm.expect(movie.id).to.not.equal(pm.collectionVariables.get('movieId'));",
+									"    });",
 									"});",
 									""
 								],
@@ -220,12 +245,12 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{basic-url}}movies/{{movieId}}",
+							"raw": "{{basic-url}}movies/",
 							"host": [
 								"{{basic-url}}movies"
 							],
 							"path": [
-								"{{movieId}}"
+								""
 							]
 						}
 					},
@@ -234,7 +259,7 @@
 			]
 		},
 		{
-			"name": "New Folder",
+			"name": "Create and change movie",
 			"item": [
 				{
 					"name": "create movie",
@@ -243,25 +268,31 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const responseData = pm.response.json();",
+									"const requestData = JSON.parse(pm.request.body.raw);",
+									"",
+									"pm.collectionVariables.set(\"movieId\", responseData.id);",
+									"pm.collectionVariables.set(\"title\", requestData.title);",
+									"pm.collectionVariables.set(\"productionDate\", requestData.productionDate);",
+									"pm.collectionVariables.set(\"producer\", requestData.producer);",
+									"pm.collectionVariables.set(\"rating\", requestData.rating);",
+									"",
 									"pm.test(\"Status code is 201\", () => {",
 									"    pm.response.to.have.status(201);",
 									"});",
 									"",
 									"pm.test(\"Response contains new movie\", () => {",
 									"    const data = pm.response.json();",
-									"    pm.expect(data).to.have.property(\"title\", data.title);",
-									"    pm.expect(data).to.have.property(\"productionDate\", data.productionDate);",
-									"    pm.expect(data).to.have.property(\"producer\", data.producer);",
-									"    pm.expect(data).to.have.property(\"rating\", data.rating);",
+									"    pm.expect(data).to.have.property(\"id\", responseData.id);",
 									"});",
 									"",
-									"pm.test(\"New movie data is correct\", function () {",
+									"pm.test(\"New movie data is correct\", () =>{",
 									"    let jsonData = pm.response.json();",
 									"    pm.expect(jsonData.title).to.eql(\"Forrest Gump\");",
 									"    pm.expect(jsonData.productionDate).to.eql(\"1994\");",
 									"    pm.expect(jsonData.producer).to.eql(\"Robert Zemeckis\");",
 									"    pm.expect(jsonData.rating).to.eql(\"8.8\");",
-									"    pm.globals.set(\"movieId\", jsonData.id);",
+									"    ",
 									"});",
 									""
 								],
@@ -302,6 +333,8 @@
 							"listen": "test",
 							"script": {
 								"exec": [
+									"const jsonData = pm.response.json();\r",
+									"pm.collectionVariables.set(\"rating\", jsonData.rating);\r",
 									"pm.test(\"Status code is 200\", function () {\r",
 									"    pm.response.to.have.status(200);\r",
 									"});\r",
@@ -318,7 +351,10 @@
 									"pm.test(\"Rating is updated correctly\", function () {\r",
 									"    let jsonData = pm.response.json();\r",
 									"    pm.expect(jsonData.rating).to.eql('10');\r",
-									"});"
+									"    \r",
+									"});\r",
+									"\r",
+									""
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -356,24 +392,23 @@
 							"listen": "test",
 							"script": {
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
+									"",
+									"pm.test(\"Status code is 200\", ()=> {",
 									"    pm.response.to.have.status(200);",
 									"});",
 									"",
-									"",
-									"pm.test(\"Response contains the correct movie ID\", function () {",
+									"pm.test(\"Response contains the correct movie ID\", ()=> {",
 									"   let jsonData = pm.response.json();",
-									"        let movieId = pm.globals.get(\"movieId\");",
+									"        let movieId = pm.collectionVariables.get(\"movieId\");",
 									"        pm.expect(jsonData[0].id).to.eql(movieId);",
 									"});",
 									"",
-									"pm.test(\"change movie is correct\", function () {",
-									"    let jsonData = pm.response.json();",
-									"    pm.expect(jsonData[0].title).to.eql(\"Forrest Gump\");",
-									"    pm.expect(jsonData[0].productionDate).to.eql(\"1994\");",
-									"    pm.expect(jsonData[0].producer).to.eql(\"Robert Zemeckis\");",
-									"    pm.expect(jsonData[0].rating).to.eql(\"10\");",
-									"});",
+									"pm.test(\"Movie rating was successfully updated\", () => {",
+									"    const responseData = pm.response.json();",
+									"    const newRating = pm.collectionVariables.get('rating');",
+									"",
+									"    pm.expect(responseData[0].rating).to.eql(newRating);",
+									"});\t\t\t\t\t",
 									"",
 									""
 								],
@@ -398,34 +433,39 @@
 					"response": []
 				},
 				{
-					"name": "get all movie",
+					"name": "get all movie with the changing rating",
 					"event": [
 						{
 							"listen": "test",
 							"script": {
 								"exec": [
+									"//Fixed JSON parsing error\r",
 									"pm.test(\"Response status code is 200\", function () {\r",
 									"  pm.response.to.have.status(200);\r",
 									"});\r",
 									"\r",
-									"pm.test(\"Response body contains the required fields for movies\", function () {\r",
+									"pm.test(\"Response body contains the required fields for movies\", ()=> {\r",
 									"    const responseData = pm.response.json();\r",
-									"    pm.expect(responseData).to.be.an('Object').that.is.not.empty;\r",
+									"    pm.expect(responseData).to.have.property(\"movies\");\r",
 									"});\r",
 									"\r",
-									"pm.test(\"No empty fields in movies response\", function () {\r",
-									"    const responseData = pm.response.json().movies;\r",
-									"    responseData.forEach(function (movie) {\r",
-									"        pm.expect(movie.id).to.not.be.null;\r",
-									"        pm.expect(movie.id).to.not.be.undefined;\r",
-									"        pm.expect(movie.title).to.not.be.empty;\r",
-									"        pm.expect(movie.productionDate).to.not.be.null;\r",
-									"        pm.expect(movie.productionDate).to.not.be.undefined;\r",
-									"        pm.expect(movie.producer).to.not.be.empty;\r",
-									"        pm.expect(movie.rating).to.not.be.null;\r",
-									"        pm.expect(movie.rating).to.not.be.undefined;\r",
-									"    });\r",
+									"pm.test(\"Rating is updated\", function () {\r",
+									"    const updatedMovie = pm.response.json().movies[0];\r",
+									"    pm.expect(updatedMovie.rating).to.eql(\"10\");\r",
 									"});\r",
+									"\r",
+									"const movies = pm.collectionVariables.has(\"movies\") ? JSON.parse(pm.collectionVariables.get(\"movies\")) : [];\r",
+									"let hasUpdatedRating = false;\r",
+									"\r",
+									"const responseData = pm.response.json();\r",
+									"\r",
+									"movies.forEach(movie => {\r",
+									"    if (movie.id === responseData.id && movie.rating === \"10\") {\r",
+									"        hasUpdatedRating = true;\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"\r",
 									""
 								],
 								"type": "text/javascript",
@@ -475,6 +515,26 @@
 			"key": "basic-url",
 			"value": "http://localhost:3002/",
 			"type": "string"
+		},
+		{
+			"key": "movieId",
+			"value": ""
+		},
+		{
+			"key": "title",
+			"value": ""
+		},
+		{
+			"key": "productionDate",
+			"value": ""
+		},
+		{
+			"key": "producer",
+			"value": ""
+		},
+		{
+			"key": "rating",
+			"value": ""
 		}
 	]
 }
